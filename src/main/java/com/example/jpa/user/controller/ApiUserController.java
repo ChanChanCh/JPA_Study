@@ -2,16 +2,16 @@ package com.example.jpa.user.controller;
 
 import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.user.entity.User;
+import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.UserInput;
+import com.example.jpa.user.model.UserUpdate;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -78,7 +78,34 @@ public class ApiUserController {
 
     }
 
+    @PutMapping("/api/user/{id}")
+    public ResponseEntity<?> updateuser(@PathVariable Long id, @RequestBody @Valid UserUpdate userUpdate, Errors errors){
 
+        List<ResponseError> responseErrorList = new ArrayList<>();
+        if(errors.hasErrors()){
+            errors.getAllErrors().forEach(e->{
+                responseErrorList.add(ResponseError.of((FieldError)e));
+            });
+            return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
+
+        user.setPhone(userUpdate.getPhone());
+        user.setUpdateDate(LocalDateTime.now());
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> userNotFoundExceptionHandler(UserNotFoundException exception){
+
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+
+    }
 
 
 

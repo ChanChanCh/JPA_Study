@@ -38,4 +38,7 @@ public class User {
     @Column
     private LocalDateTime regDate;
 
+    @Column
+    private  LocalDateTime updateDate;
+
 }
