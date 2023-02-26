@@ -1,6 +1,7 @@
 package com.example.jpa.user.repository;
 
 import com.example.jpa.user.entity.User;
+import com.example.jpa.user.model.UserInput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
-
+    int countByEmail(String email);
 
 }
