@@ -281,6 +281,42 @@ public class ApiUserController {
      */
 
 
+//    @PostMapping("/api/user/login")
+//    public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors){
+//
+//        List<ResponseError> responseErrorList = new ArrayList<>();
+//        if(errors.hasErrors()){
+//            errors.getAllErrors().stream().forEach((e)->{
+//                responseErrorList.add(ResponseError.of((FieldError)e));
+//            });
+//            return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        User user = userRepository.findByEmail(userLogin.getEmail())
+//                .orElseThrow(()->new UserNotFoundException("사용자의 정보가 없습니다."));
+//
+//        if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())){
+//            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+//        }
+//
+//        //토큰발행시점
+//
+//        String token = JWT.create()
+//                .withExpiresAt(new Date())
+//                .withClaim("user_id", user.getId())
+//                .withIssuer(user.getUserName())
+//                .withIssuer(user.getEmail())
+//                .sign(Algorithm.HMAC512("fastcampus".getBytes()));
+//
+//
+//        return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
+//    }
+
+
+    /*
+        45. JWT  토큰 발행시 발생 유효기간을 1개월로 저장하는 API 작성
+     */
+
     @PostMapping("/api/user/login")
     public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors){
 
@@ -299,10 +335,13 @@ public class ApiUserController {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
 
+        LocalDateTime expiredDateTime = LocalDateTime.now().plusMonths(1);
+        Date expireDate = java.sql.Timestamp.valueOf(expiredDateTime);
+
         //토큰발행시점
 
         String token = JWT.create()
-                .withExpiresAt(new Date())
+                .withExpiresAt(expireDate)
                 .withClaim("user_id", user.getId())
                 .withIssuer(user.getUserName())
                 .withIssuer(user.getEmail())
