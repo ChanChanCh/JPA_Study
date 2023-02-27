@@ -1,5 +1,7 @@
 package com.example.jpa.user.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jpa.notice.entity.Notice;
 import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.notice.repository.NoticeRepository;
@@ -8,10 +10,7 @@ import com.example.jpa.user.exception.ExsitsEmailException;
 import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.notice.model.NoticeResponse;
-import com.example.jpa.user.model.UserInput;
-import com.example.jpa.user.model.UserLogin;
-import com.example.jpa.user.model.UserResponse;
-import com.example.jpa.user.model.UserUpdate;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
 import com.example.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -252,6 +252,35 @@ public class ApiUserController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+//    @PostMapping("/api/user/login")
+//    public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors){
+//
+//        List<ResponseError> responseErrorList = new ArrayList<>();
+//        if(errors.hasErrors()){
+//            errors.getAllErrors().stream().forEach((e)->{
+//                responseErrorList.add(ResponseError.of((FieldError)e));
+//            });
+//            return new ResponseEntity<>(responseErrorList, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        User user = userRepository.findByEmail(userLogin.getEmail())
+//                .orElseThrow(()->new UserNotFoundException("사용자의 정보가 없습니다."));
+//
+//        if(!PasswordUtils.equalPassword(userLogin.getPassword(), user.getPassword())){
+//            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+//        }
+//
+//        return ResponseEntity.ok().build();
+//    }
+//
+//
+
+    /*
+        44. 사용자의 이메일과 비밀번호를 통해서 JWT를 발행하는 로직
+        - JWT 토큰 발행
+     */
+
+
     @PostMapping("/api/user/login")
     public ResponseEntity<?> createToken(@RequestBody @Valid UserLogin userLogin, Errors errors){
 
@@ -270,8 +299,20 @@ public class ApiUserController {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
 
-        return ResponseEntity.ok().build();
+        //토큰발행시점
+
+        String token = JWT.create()
+                .withExpiresAt(new Date())
+                .withClaim("user_id", user.getId())
+                .withIssuer(user.getUserName())
+                .withIssuer(user.getEmail())
+                .sign(Algorithm.HMAC512("fastcampus".getBytes()));
+
+
+        return ResponseEntity.ok().body(UserLoginToken.builder().token(token).build());
     }
+
+
 
 
 }
