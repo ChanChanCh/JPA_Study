@@ -99,5 +99,27 @@ public class ApiAdminUserController {
         return ResponseEntity.ok().body(ResponseMessage.success(userList));
     }
 
+    /*
+        사용자의 상태를 변경하는 API를 작성해 보세요.
+        - 사용자 상태 : (정상, 정지)
+        - 이에 대한 플래그값은 사용자상태(Using, 정지:Stop)
+     */
+
+    @PatchMapping("/api/admin/user/{id}/status")
+    public ResponseEntity<?> userStatus(@PathVariable Long id, @RequestBody UserStatusInput userStatusInput){
+
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(!optionalUser.isPresent()){
+            return new ResponseEntity<>(ResponseMessage.fail("사용자의 정보가 존재하지 않습니다."), HttpStatus.BAD_REQUEST);
+        }
+
+        User user = optionalUser.get();
+
+        user.setStatus(userStatusInput.getStatus());
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
 
 }

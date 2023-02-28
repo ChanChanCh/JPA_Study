@@ -1,5 +1,6 @@
 package com.example.jpa.user.entity;
 
+import com.example.jpa.user.model.UserStatus;
 import jdk.vm.ci.meta.Local;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,5 +41,8 @@ public class User {
 
     @Column
     private  LocalDateTime updateDate;
+
+    @Column
+    private UserStatus status;
 
 }
