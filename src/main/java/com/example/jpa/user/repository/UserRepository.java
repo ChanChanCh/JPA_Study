@@ -20,8 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     int countByEmail(String email);
 
-
     Optional<User> findByEmail(String email);
 
+    List<User> findByEmailContainsOrPhoneContainsOrUserNameContains(String email, String phone, String UserName);
 
 }
