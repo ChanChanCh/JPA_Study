@@ -47,16 +47,6 @@ create table NOTICE_LIKE
 );
 
 
-create table USER_LOGIN_HISTORY
-(
-    ID          BIGINT auto_increment primary key,
-    USER_ID     BIGINT,
-    EMAIL       VARCHAR(255),
-    USER_NAME   VARCHAR(255),
-    LOGIN_DATE  TIMESTAMP,
-    IP_ADDR   VARCHAR(255)
-);
-
 create table BOARD_TYPE
 (
     ID          BIGINT auto_increment primary key,
@@ -66,7 +56,6 @@ create table BOARD_TYPE
 
     USING_YN    BOOLEAN
 );
-
 
 -- auto-generated definition
 create table BOARD
@@ -82,4 +71,13 @@ create table BOARD
     constraint FK_BOARD_USER_ID foreign key (USER_ID) references USER (ID)
 );
 
+create table USER_LOGIN_HISTORY
+(
+    ID          BIGINT auto_increment primary key,
+    USER_ID     BIGINT,
+    EMAIL       VARCHAR(255),
+    USER_NAME   VARCHAR(255),
+    LOGIN_DATE  TIMESTAMP,
+    IP_ADDR   VARCHAR(255)
+);
 
