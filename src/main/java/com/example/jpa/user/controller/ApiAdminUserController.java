@@ -34,7 +34,7 @@ import java.util.Optional;
 public class ApiAdminUserController {
 
     private final UserRepository userRepository;
-
+    private final NoticeRepository noticeRepository;
 
     /*
          48. 사용자 목록과 사용자 수를 함께 내리는 REST API를 작성해 보세요
@@ -119,6 +119,32 @@ public class ApiAdminUserController {
         userRepository.save(user);
 
         return ResponseEntity.ok().build();
+    }
+
+    /*
+         52. 사용자 정보를 삭제하는 API를 작성
+         - 작성된 게시글이 있으면 예외 발생 처리
+     */
+
+    @DeleteMapping("/api/admin/user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id){
+
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(!optionalUser.isPresent()){
+            return new ResponseEntity<>(ResponseMessage.fail("사용자 정보가 존재하지 않습니다."), HttpStatus.BAD_REQUEST);
+        }
+
+
+        User user = optionalUser.get();
+
+        if(noticeRepository.countByUser(user)> 0){
+            return new ResponseEntity<>(ResponseMessage.fail("사용자가 작성한 공지사항이 있습니다."), HttpStatus.BAD_REQUEST);
+        }
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok().build();
+
     }
 
 
